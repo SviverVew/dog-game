@@ -1,0 +1,50 @@
+# Thư mục rác tự sinh của Unity (Bắt buộc phải chặn)
+/[Ll]ibrary/
+/[temp]/
+/[Obj]/
+/[Build]/
+/[Builds]/
+/[Logs]/
+/[UserSettings]/
+/[MemoryCaptures]/
+
+# Chặn các file cấu hình và bộ nhớ đệm của Asset Store
+/[As[As]sets/AssetStoreTools*
+
+# Chặn các file chạy được sinh ra sau khi Build game (nếu bạn build bên trong thư mục project)
+*.apk
+*.aab
+*.unitypackage
+*.exe
+
+# Thư mục tự sinh của các phần mềm viết code (VS Code, Visual Studio, Rider)
+.vs/
+.idea/
+.gradle/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Thư mục Crash logs của Unity
+sysinfo.txt
+
+# File ẩn của hệ điều hành (Mac và Windows)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
