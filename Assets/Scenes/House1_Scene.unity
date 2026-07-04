@@ -19363,6 +19363,7 @@ GameObject:
   - component: {fileID: 1453408813}
   - component: {fileID: 1453408812}
   - component: {fileID: 1453408814}
+  - component: {fileID: 1453408815}
   m_Layer: 0
   m_Name: Coffee Table
   m_TagString: Untagged
@@ -19457,12 +19458,25 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.4911602, y: 0.5035994, z: 1.4911602}
   m_Center: {x: 0, y: 0, z: 0.00000047683716}
+--- !u!114 &1453408815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453408810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f7da48cbf0134448a51d32986af08bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DropZone
+  targetSlipperCount: 3
 --- !u!1 &1463139873
 GameObject:
   m_ObjectHideFlags: 0

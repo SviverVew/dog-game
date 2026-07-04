@@ -137,42 +137,47 @@ public class DogAction : MonoBehaviour
 }
 
 void DropSlipper()
-{
-    if (currentSlipper == null)
-        return;
-
-    if (dropConfirmCoroutine != null)
     {
-        StopCoroutine(dropConfirmCoroutine);
-        dropConfirmCoroutine = null;
+        if (currentSlipper == null)
+            return;
+
+        // Hủy bộ đếm thời gian chờ ấn E lần 2
+        if (dropConfirmCoroutine != null)
+        {
+            StopCoroutine(dropConfirmCoroutine);
+            dropConfirmCoroutine = null;
+        }
+        awaitingDropConfirmation = false;
+
+        // 1. Gỡ chiếc dép ra khỏi miệng con chó (Không còn là cha con nữa)
+        currentSlipper.transform.SetParent(null);
+
+        // 2. CẬP NHẬT TRẠNG THÁI TRƯỚC: Báo cho hệ thống biết dép đã được thả tự do
+        // Dòng này đặt ở đây giúp DropZone nhận diện chính xác ngay lập tức khi va chạm
+        currentSlipper.isPickedUp = false;
+
+        // 3. Khôi phục lại các thuộc tính vật lý của Rigidbody
+        Rigidbody rb = currentSlipper.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.detectCollisions = true;
+            
+            // Hất nhẹ chiếc dép về phía trước và hướng lên trên một chút cho đẹp mắt
+            rb.AddForce(transform.forward * 3f + Vector3.up * 1.5f, ForceMode.Impulse);
+        }
+
+        // 4. Bật lại Collider vật lý của chiếc dép để nó có thể rơi chạm đất hoặc chạm DropZone
+        Collider slipperCol = currentSlipper.GetComponent<Collider>();
+        if (slipperCol != null)
+        {
+            slipperCol.enabled = true;
+            slipperCol.isTrigger = false;
+        }
+
+        // 5. Giải phóng biến tạm trên người chó để có thể đi nhặt chiếc dép tiếp theo
+        currentSlipper = null;
     }
-    awaitingDropConfirmation = false;
-
-    // 1. Bỏ liên kết cha con
-    currentSlipper.transform.SetParent(null);
-
-    // 2. Khôi phục Rigidbody về trạng thái mô phỏng vật lý bình thường
-    Rigidbody rb = currentSlipper.GetComponent<Rigidbody>();
-    if (rb != null)
-    {
-        rb.isKinematic = false;
-        rb.detectCollisions = true;
-        
-        // Mẹo nhỏ: Thêm một lực đẩy nhẹ về phía trước để dép không bị rớt trúng chân con chó gây kẹt
-        rb.AddForce(transform.forward * 2f + Vector3.up * 1f, ForceMode.Impulse);
-    }
-
-    // 3. Bật lại Collider vật lý cho chiếc dép
-    Collider slipperCol = currentSlipper.GetComponent<Collider>();
-    if (slipperCol != null)
-    {
-        slipperCol.enabled = true;
-        slipperCol.isTrigger = false;
-    }
-
-    currentSlipper.isPickedUp = false;
-    currentSlipper = null;
-}
 
     IEnumerator DropConfirmCountdown()
     {
