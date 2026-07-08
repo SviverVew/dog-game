@@ -98,7 +98,7 @@ public class DogAction : MonoBehaviour
     if (currentSlipper != null)
         return;
 
-    Collider[] colliders = Physics.OverlapSphere(transform.position, 2f);
+    Collider[] colliders = Physics.OverlapSphere(transform.position, promptRadius);
 
     foreach (Collider col in colliders)
     {
@@ -109,24 +109,30 @@ public class DogAction : MonoBehaviour
             currentSlipper = slipper;
             slipper.isPickedUp = true;
 
-            // 1. Tắt Collider hoàn toàn thay vì để isTrigger (để chắc chắn không va chạm với chân chó)
+            // XÓA TAG "Collected" NGAY KHI NHẶT LÊN để reset trạng thái chiếc dép
+            if (col.gameObject.CompareTag("Collected"))
+            {
+                col.gameObject.tag = "Untagged";
+            }
+
+            // Tắt Collider hoàn toàn để tránh lỗi vật lý
             Collider slipperCol = slipper.GetComponent<Collider>();
             if (slipperCol != null)
             {
-                slipperCol.enabled = false; 
+                slipperCol.enabled = false;
             }
 
-            // 2. Xử lý Rigidbody cực kỳ nghiêm ngặt
+            // Cấu hình Rigidbody của dép về dạng Kinematic
             Rigidbody rb = slipper.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = true;
-                rb.linearVelocity = Vector3.zero;        // Xóa sạch vận tốc thừa
-                rb.angularVelocity = Vector3.zero; // Xóa sạch vận tốc xoay thừa
-                rb.detectCollisions = false;       // Ép hệ thống vật lý ngừng quét va chạm trên vật này
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.detectCollisions = false;
             }
 
-            // 3. Đưa vào miệng con chó
+            // Gắn vào mồm chó
             slipper.transform.SetParent(mouthPoint, false);
             slipper.transform.localPosition = Vector3.zero;
             slipper.transform.localRotation = Quaternion.identity;
@@ -135,7 +141,6 @@ public class DogAction : MonoBehaviour
         }
     }
 }
-
 void DropSlipper()
     {
         if (currentSlipper == null)

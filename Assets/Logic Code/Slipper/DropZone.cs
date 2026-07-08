@@ -1,49 +1,76 @@
 using UnityEngine;
+using TMPro; // BẮT BUỘC phải có dòng này để điều khiển TextMeshPro
 
 public class DropZone : MonoBehaviour
 {
+    [Header("Mission UI Setup")]
+    public TMP_Text missionText; // Kéo file MissionText vào đây trong Inspector
+    public string missionPrefix = "Số dép đã thu thập: ";
+
     [Header("Settings")]
-    public int targetSlipperCount = 3; // Số dép cần thiết để qua màn
-    private int currentSlipperCount = 0; // Số dép hiện tại đã thu thập được
+    public int targetSlipperCount = 5; // Đổi thành 5 theo yêu cầu của bạn
+    private int currentSlipperCount = 0; 
+
+    void Start()
+    {
+        // Cập nhật text hiển thị ngay khi bắt đầu game (Ví dụ: 0/5)
+        UpdateMissionUI();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Kiểm tra xem vật thể bay/rơi vào vùng này có chứa component Slipper không
         Slipper slipper = other.GetComponent<Slipper>();
 
-        if (slipper != null)
+        // Chỉ tính điểm khi vật thể là Dép và ĐÃ ĐƯỢC THẢ RA
+        if (slipper != null && !slipper.isPickedUp)
         {
-            // CHỈ TÍNH ĐIỂM KHI ĐÔI DÉP ĐÃ ĐƯỢC THẢ RA (Không tính lúc chó đang ngậm đi qua)
-            if (!slipper.isPickedUp)
+            if (!other.gameObject.CompareTag("Collected"))
             {
-                // Thêm một cái tag ẩn hoặc component phụ để tránh việc 1 chiếc dép bị tính điểm 2 lần
-                if (!other.gameObject.CompareTag("Collected"))
+                other.gameObject.tag = "Collected"; 
+                currentSlipperCount++;
+                
+                // CẬP NHẬT CHỮ TRÊN MÀN HÌNH
+                UpdateMissionUI();
+
+                if (currentSlipperCount >= targetSlipperCount)
                 {
-                    other.gameObject.tag = "Collected"; // Đánh dấu dép đã tính điểm
-                    currentSlipperCount++;
-                    
-                    Debug.Log($"Đã thu thập: {currentSlipperCount} / {targetSlipperCount} chiếc dép!");
-
-                    // Khóa vật lý chiếc dép lại cho nó nằm im trong vùng nhận điểm
-                    Rigidbody rb = other.GetComponent<Rigidbody>();
-                    if (rb != null) rb.isKinematic = true;
-
-                    // Kiểm tra điều kiện thắng màn
-                    if (currentSlipperCount >= targetSlipperCount)
-                    {
-                        WinLevel();
-                    }
+                    WinLevel();
                 }
             }
         }
     }
 
+    private void OnTriggerExit(Collider other)
+    {
+        Slipper slipper = other.GetComponent<Slipper>();
+
+        // Nếu dép đã tính điểm bị mang đi nơi khác -> Trừ điểm
+        if (slipper != null && other.gameObject.CompareTag("Collected"))
+        {
+            other.gameObject.tag = "Untagged"; 
+            currentSlipperCount--; 
+            
+            // CẬP NHẬT LẠI CHỮ TRÊN MÀN HÌNH (Ví dụ đang 2/5 tụt xuống 1/5)
+            UpdateMissionUI();
+        }
+    }
+
+    // Hàm phụ trách thay đổi chữ trên thanh nhiệm vụ
+    void UpdateMissionUI()
+    {
+        if (missionText != null)
+        {
+            missionText.text = missionPrefix + currentSlipperCount + "/" + targetSlipperCount;
+        }
+    }
+
     void WinLevel()
     {
-        Debug.Log("CHÚC MỪNG! BẠN ĐÃ THU THẬP ĐỦ DÉP VÀ VƯỢT QUA MÀN!");
-        
-        // Đoạn này dùng để chuyển Scene sang màn tiếp theo
-        // Để dùng được câu lệnh dưới, nhớ thêm "using UnityEngine.SceneManagement;" ở trên đầu nhé.
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        if (missionText != null)
+        {
+            missionText.text = "<color=green>NHIỆM VỤ HOÀN THÀNH!</color>";
+        }
+        Debug.Log("CHÚC MỪNG! BẠN ĐÃ VƯỢT QUA MÀN!");
+        // Thêm logic chuyển cảnh tại đây nếu muốn
     }
 }
