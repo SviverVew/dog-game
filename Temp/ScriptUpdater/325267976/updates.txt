@@ -1,1 +1,0 @@
-Temp/ScriptUpdater/325267976/1923799913_UISettingsManager.cs => Assets/SlimUI/Modern Menu 1/Scripts/Managers/UISettingsManager.cs
