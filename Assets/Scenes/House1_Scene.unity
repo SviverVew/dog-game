@@ -1571,7 +1571,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 119359487}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25340134, y: 0.0000000068551027, z: -0.0000000017957017, w: 0.9673613}
+  m_LocalRotation: {x: 0.25340128, y: 0.000000050790483, z: -0.00000001330462, w: 0.9673613}
   m_LocalPosition: {x: -0.85, y: 3.367, z: 1.46}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
@@ -12310,7 +12310,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 980634871}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25340134, y: 0.000000007513331, z: -0.000000004308492, w: 0.9673613}
+  m_LocalRotation: {x: 0.25340128, y: 0.00000004936648, z: -0.000000007868476, w: 0.9673613}
   m_LocalPosition: {x: 0.13999999, y: 5.59, z: -7.38}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
@@ -12339,7 +12339,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-        Gain: 100
+        Gain: 10
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
@@ -12352,7 +12352,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-        Gain: 1
+        Gain: 5
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
@@ -28144,7 +28144,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -14.2, y: 232.1}
+  m_AnchoredPosition: {x: -14.2, y: 188}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2146367555
