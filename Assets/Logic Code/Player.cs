@@ -94,7 +94,8 @@ namespace StarterAssets
         private float barkPenaltyTimer = 0f;
 
         // Animation Parameter IDs
-        private int _animIDSpeed;
+        private int _animIDRunTrigger;
+        private int _animIDIdleTrigger;
         private int _animIDGrounded;
         private int _animIDJump;
         private int _animIDFreeFall;
@@ -102,6 +103,7 @@ namespace StarterAssets
         private int _animIDAngryTrigger;  
 
         private bool _hasAnimator;
+        private bool _wasMoving;
 
         private bool IsCurrentDeviceMouse
         {
@@ -193,6 +195,8 @@ namespace StarterAssets
                 moveDirection = (Vector3.forward * moveForward + Vector3.right * moveHorizontal).normalized;
             }
 
+            UpdateMovementAnimation(moveDirection.sqrMagnitude > 0.001f);
+
             if (_input.jump && isGrounded)
             {
                 Jump();
@@ -224,7 +228,8 @@ namespace StarterAssets
 
         private void AssignAnimationIDs()
         {
-            _animIDSpeed = Animator.StringToHash("Speed");
+            _animIDRunTrigger = Animator.StringToHash("Run");
+            _animIDIdleTrigger = Animator.StringToHash("Idle");
             _animIDGrounded = Animator.StringToHash("Grounded");
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
@@ -234,24 +239,44 @@ namespace StarterAssets
 
         private void MovePlayer()
         {
+            bool hasMovementInput = moveDirection.sqrMagnitude > 0.001f;
             float targetSpeed = isSprinting ? sprintSpeed : moveSpeed;
-            if (moveDirection == Vector3.zero) targetSpeed = 0f;
-
-            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.fixedDeltaTime * 15f);
+            if (!hasMovementInput)
+            {
+                // Dừng Rigidbody ngay; Animator được chuyển bằng trigger Idle trong Update.
+                targetSpeed = 0f;
+                currentSpeed = 0f;
+            }
+            else
+            {
+                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.fixedDeltaTime * 15f);
+            }
 
             Vector3 velocity = moveDirection * currentSpeed;
             rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
 
-            if (moveDirection.sqrMagnitude > 0.001f)
+            if (hasMovementInput)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
                 rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
             }
 
-            // Gửi trực tiếp vận tốc của CHA xuống cho ANIMATOR của CON
-            if (_hasAnimator)
+        }
+
+        private void UpdateMovementAnimation(bool isMoving)
+        {
+            if (!_hasAnimator || isMoving == _wasMoving) return;
+
+            _wasMoving = isMoving;
+            if (isMoving)
             {
-                _animator.SetFloat(_animIDSpeed, currentSpeed);
+                _animator.ResetTrigger(_animIDIdleTrigger);
+                _animator.SetTrigger(_animIDRunTrigger);
+            }
+            else
+            {
+                _animator.ResetTrigger(_animIDRunTrigger);
+                _animator.SetTrigger(_animIDIdleTrigger);
             }
         }
 

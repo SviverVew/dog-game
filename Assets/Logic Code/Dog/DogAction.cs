@@ -12,10 +12,13 @@ public class DogAction : MonoBehaviour
     [Header("Animation Settings")]
     [Tooltip("Kéo thả CHÍNH XÁC Thằng Con (chứa Animator) vào đây.")]
     [SerializeField] private Animator animator;
-    private int _animIDIsEatingBool; 
+    private int _animIDEatTrigger;
 
-    [Tooltip("Thời gian trễ (giây) tính từ lúc ấn E cúi đầu cho đến khi mồm chạm dép để ngậm lên.")]
-    [SerializeField] private float pickUpDelay = 0.45f; 
+    [Tooltip("Tên đầy đủ của state animation cúi xuống nhặt dép.")]
+    [SerializeField] private string eatAnimationState = "Base Layer.chihuahua_EatingStart";
+
+    [Tooltip("Thời gian chờ tối đa để tránh coroutine bị kẹt nếu Animator cấu hình sai.")]
+    [SerializeField] private float maxEatAnimationWait = 5f;
 
     private Slipper currentSlipper;
     public bool IsHoldingSlipper => currentSlipper != null;
@@ -34,7 +37,7 @@ public class DogAction : MonoBehaviour
             animator = GetComponentInChildren<Animator>();
         }
 
-        _animIDIsEatingBool = Animator.StringToHash("Eat"); 
+        _animIDEatTrigger = Animator.StringToHash("Eat");
     }
 
     void Update()
@@ -142,11 +145,14 @@ public class DogAction : MonoBehaviour
         // 1. KÍCH HOẠT ANIMATION ĂN (Chú chó bắt đầu cúi đầu xuống)
         if (animator != null)
         {
-            animator.SetBool(_animIDIsEatingBool, true);
+            animator.SetTrigger(_animIDEatTrigger);
         }
 
-        // 2. CHỜ hoạt ảnh cúi đầu diễn ra đạt tới điểm mồm chạm đất
-        yield return new WaitForSeconds(pickUpDelay);
+        // 2. CHỜ state Eat chạy xong rồi mới đưa dép lên miệng.
+        if (animator != null)
+        {
+            yield return WaitForEatAnimationToFinish();
+        }
 
         // Kiểm tra lại lần nữa phòng trường hợp chiếc dép bị biến mất/ai đó nhặt mất trong lúc chờ
         if (targetSlipper != null && !targetSlipper.isPickedUp)
@@ -173,21 +179,56 @@ public class DogAction : MonoBehaviour
             }
 
             // 3. CHÍNH THỨC HÚT DÉP VÀO MỒM
-            currentSlipper.transform.SetParent(mouthPoint, false);
-            currentSlipper.transform.localPosition = Vector3.zero;
-            currentSlipper.transform.localRotation = Quaternion.identity;
+            // Giữ nguyên kích thước thế giới của dép khi đưa vào hierarchy của model chó.
+            // SetParent(..., false) sẽ nhân localScale của dép với scale của xương miệng.
+            currentSlipper.transform.SetParent(mouthPoint, true);
+            currentSlipper.transform.position = mouthPoint.position;
+            currentSlipper.transform.rotation = mouthPoint.rotation;
         }
         else
         {
             // Nếu có lỗi xảy ra không ngậm được dép, trả trạng thái animation về bình thường
             if (animator != null)
             {
-                animator.SetBool(_animIDIsEatingBool, false);
+                animator.ResetTrigger(_animIDEatTrigger);
             }
         }
 
         // Mở khóa phím E
         isPickingUpInProgress = false;
+    }
+
+    private IEnumerator WaitForEatAnimationToFinish()
+    {
+        int eatStateHash = Animator.StringToHash(eatAnimationState);
+        float timeoutAt = Time.time + maxEatAnimationWait;
+
+        // Chờ Animator nhận Trigger và thực sự đi vào state Eat.
+        while (Time.time < timeoutAt &&
+               animator.GetCurrentAnimatorStateInfo(0).fullPathHash != eatStateHash)
+        {
+            yield return null;
+        }
+
+        if (animator.GetCurrentAnimatorStateInfo(0).fullPathHash != eatStateHash)
+        {
+            Debug.LogWarning($"DogAction: Không tìm thấy state '{eatAnimationState}'. Hãy kiểm tra tên state trong Animator.");
+            yield break;
+        }
+
+        // Chờ animation và phần transition ra khỏi EatingStart kết thúc hoàn toàn.
+        while (Time.time < timeoutAt)
+        {
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+            if (state.fullPathHash != eatStateHash && !animator.IsInTransition(0))
+            {
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        Debug.LogWarning($"DogAction: State '{eatAnimationState}' chạy quá {maxEatAnimationWait} giây.");
     }
 
     void DropSlipper()
@@ -203,7 +244,7 @@ public class DogAction : MonoBehaviour
 
         if (animator != null)
         {
-            animator.SetBool(_animIDIsEatingBool, false);
+            animator.ResetTrigger(_animIDEatTrigger);
         }
 
         currentSlipper.transform.SetParent(null);

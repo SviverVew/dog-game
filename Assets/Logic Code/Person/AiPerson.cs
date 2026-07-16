@@ -22,17 +22,26 @@ public class AiPerson : MonoBehaviour
     public float detectionCheckInterval = 0.5f;
 
     private Rigidbody rb;
+    private Animator animator;
     private Vector3 wanderTarget;
     private float attackTimer;
     private float detectionTimer;
     private bool chasing = false;
     private int slippersRemaining;
+    private bool wasMoving = false;
+
+    private int animIDRunTrigger;
+    private int animIDIdleTrigger;
+    private int animIDFightTrigger;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         if (rb == null)
             rb = gameObject.AddComponent<Rigidbody>();
+
+        animator = GetComponent<Animator>();
+        AssignAnimationIDs();
 
         if (player == null)
             player = FindObjectOfType<Player>(); // Đổi từ Player thành ThirdPersonController
@@ -46,6 +55,8 @@ public class AiPerson : MonoBehaviour
 
         if (throwOrigin == null)
             throwOrigin = transform;
+
+        UpdateMovementAnimation(false);
     }
 
     void Update()
@@ -126,7 +137,10 @@ public class AiPerson : MonoBehaviour
         Vector3 direction = (target - transform.position);
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.01f)
+        {
+            StopMoving();
             return;
+        }
 
         Vector3 velocity = direction.normalized * speed;
         if (rb != null)
@@ -142,6 +156,20 @@ public class AiPerson : MonoBehaviour
         }
 
         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
+        UpdateMovementAnimation(true);
+    }
+
+    void StopMoving()
+    {
+        if (rb != null)
+        {
+            Vector3 newVelocity = rb.linearVelocity;
+            newVelocity.x = 0f;
+            newVelocity.z = 0f;
+            rb.linearVelocity = newVelocity;
+        }
+
+        UpdateMovementAnimation(false);
     }
 
     void ChooseWanderTarget()
@@ -162,6 +190,8 @@ public class AiPerson : MonoBehaviour
             return;
 
         attackTimer = attackCooldown;
+        TriggerFightAnimation();
+
         if (player != null)
         {
             player.TakeDamage(10); // Gọi hàm TakeDamage nhận sát thương từ code của bạn
@@ -200,6 +230,42 @@ public class AiPerson : MonoBehaviour
             thrownCollider = thrown.AddComponent<SphereCollider>();
 
         Debug.Log("Person đã ném dép.");
+    }
+
+    void AssignAnimationIDs()
+    {
+        animIDRunTrigger = Animator.StringToHash("Run");
+        animIDIdleTrigger = Animator.StringToHash("Idle");
+        animIDFightTrigger = Animator.StringToHash("Fight");
+    }
+
+    void UpdateMovementAnimation(bool isMoving)
+    {
+        if (animator == null || wasMoving == isMoving)
+            return;
+
+        if (isMoving)
+        {
+            animator.ResetTrigger(animIDIdleTrigger);
+            animator.SetTrigger(animIDRunTrigger);
+        }
+        else
+        {
+            animator.ResetTrigger(animIDRunTrigger);
+            animator.SetTrigger(animIDIdleTrigger);
+        }
+
+        wasMoving = isMoving;
+    }
+
+    void TriggerFightAnimation()
+    {
+        if (animator == null)
+            return;
+
+        animator.ResetTrigger(animIDRunTrigger);
+        animator.ResetTrigger(animIDIdleTrigger);
+        animator.SetTrigger(animIDFightTrigger);
     }
 
     void OnDrawGizmosSelected()
