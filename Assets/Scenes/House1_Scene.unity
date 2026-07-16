@@ -14687,6 +14687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537f8d47922f34ecea37614105f8593e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarterAssets.Player
+  _animator: {fileID: 1505069221}
   moveSpeed: 5
   sprintSpeed: 8
   rotationSpeed: 15
@@ -24374,6 +24375,11 @@ PrefabInstance:
 --- !u!4 &1505069220 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7929980497081295190, guid: 3e9ebf26f6c110142a94d7ad4f46b9f1, type: 3}
+  m_PrefabInstance: {fileID: 1505069219}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1505069221 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7463337142469929755, guid: 3e9ebf26f6c110142a94d7ad4f46b9f1, type: 3}
   m_PrefabInstance: {fileID: 1505069219}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1506218545

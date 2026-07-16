@@ -18,7 +18,11 @@ namespace StarterAssets
     {
         [Header("References")]
         private Rigidbody rb;
-        private Animator _animator;
+        
+        // Thêm trường serialize để bạn có thể kéo trực tiếp Model Con vào nếu muốn chắc chắn 100%
+        [Tooltip("Kéo Model chứa Animator của con vào đây. Nếu để trống, code sẽ tự tìm ở các Object con.")]
+        [SerializeField] private Animator _animator;
+        
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
         private Transform mainCameraTransform;
@@ -39,7 +43,7 @@ namespace StarterAssets
         private Vector3 moveDirection;
 
         [Header("Jumping & Gravity")]
-        [Tooltip("Lực nhảy nhảy")]
+        [Tooltip("Lực nhảy")]
         public float jumpForce = 6.0f;
         [Tooltip("Trọng lực cộng thêm khi rơi tự do")]
         public float extraGravity = 15.0f; 
@@ -89,13 +93,13 @@ namespace StarterAssets
         private float barkWindowTimer = 0f;
         private float barkPenaltyTimer = 0f;
 
-        // Animation Parameter IDs (Khớp tên tham số được đặt trong Animator của bạn)
+        // Animation Parameter IDs
         private int _animIDSpeed;
         private int _animIDGrounded;
         private int _animIDJump;
         private int _animIDFreeFall;
-        private int _animIDEatingTrigger; // Ví dụ kích hoạt chuỗi Ăn
-        private int _animIDAngryTrigger;  // Kích hoạt chuỗi Tức giận/Sủa
+        private int _animIDEatingTrigger; 
+        private int _animIDAngryTrigger;  
 
         private bool _hasAnimator;
 
@@ -125,13 +129,17 @@ namespace StarterAssets
 
         private void Start()
         {
-            // Lấy Animator từ con hoặc chính nó
-            _animator = GetComponentInChildren<Animator>();
+            // Tự động tìm Animator ở các Object con nếu chưa kéo thả thủ công ngoài Inspector
             if (_animator == null)
             {
-                _animator = GetComponent<Animator>();
+                _animator = GetComponentInChildren<Animator>();
             }
+            
             _hasAnimator = _animator != null;
+            if (!_hasAnimator)
+            {
+                Debug.LogWarning("Player: Không tìm thấy Component Animator trên Object con nào. Hãy kéo thủ công Model con vào ô Animator trong Inspector!");
+            }
 
             rb = GetComponent<Rigidbody>();
             _input = GetComponent<StarterAssetsInputs>();
@@ -190,7 +198,7 @@ namespace StarterAssets
                 Jump();
             }
 
-            // Đồng bộ trạng thái mặt đất vào Animator
+            // Đồng bộ trạng thái mặt đất vào Animator con
             if (_hasAnimator)
             {
                 _animator.SetBool(_animIDGrounded, isGrounded);
@@ -216,13 +224,12 @@ namespace StarterAssets
 
         private void AssignAnimationIDs()
         {
-            // Thay đổi các chuỗi ký tự này trùng khớp với tên Parameter bạn tạo bên cửa sổ Parameters của Animator
             _animIDSpeed = Animator.StringToHash("Speed");
             _animIDGrounded = Animator.StringToHash("Grounded");
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
-            _animIDEatingTrigger = Animator.StringToHash("Eat"); // Trigger chuyển đến EatingStart
-            _animIDAngryTrigger = Animator.StringToHash("Bark"); // Trigger chuyển đến AngryStart
+            _animIDEatingTrigger = Animator.StringToHash("Eat"); 
+            _animIDAngryTrigger = Animator.StringToHash("Bark"); 
         }
 
         private void MovePlayer()
@@ -241,7 +248,7 @@ namespace StarterAssets
                 rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
             }
 
-            // Đồng bộ tốc độ với blend tree / trạng thái di chuyển của bạn
+            // Gửi trực tiếp vận tốc của CHA xuống cho ANIMATOR của CON
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, currentSpeed);
@@ -333,13 +340,11 @@ namespace StarterAssets
 
         private void UpdateActions()
         {
-            // Nhấn phím Q để Cắn (Đồng bộ với chuỗi hoạt ảnh Eating)
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 Bite();
             }
 
-            // Nhấn phím R để Sủa (Đồng bộ với chuỗi hoạt ảnh Angry)
             if (Input.GetKeyDown(KeyCode.R))
             {
                 Bark();
@@ -351,12 +356,7 @@ namespace StarterAssets
             if (!canBite) return;
             canBite = false;
             
-            if (_hasAnimator)
-            {
-                // Kích hoạt Trigger "Eat" để bắt đầu chuyển trạng thái None -> EatingStart
-                _animator.SetTrigger(_animIDEatingTrigger);
-            }
-
+            
             Debug.Log("Cắn! (Q)");
             StartCoroutine(BiteCooldown());
         }
@@ -387,7 +387,6 @@ namespace StarterAssets
                 return;
             }
 
-            // Kích hoạt Trigger "Bark" để bắt đầu chuyển trạng thái None -> AngryStart
             if (_hasAnimator)
             {
                 _animator.SetTrigger(_animIDAngryTrigger);
