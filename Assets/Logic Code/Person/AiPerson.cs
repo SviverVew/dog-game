@@ -1,8 +1,10 @@
 using UnityEngine;
+using StarterAssets; // Thêm dòng này để nhận diện class ThirdPersonController mới
 
 public class AiPerson : MonoBehaviour
 {
-    public Player player;
+    [Header("References")]
+    public Player player; // Đổi từ Player thành ThirdPersonController
     public Transform homeAreaCenter;
     public Vector3 homeAreaSize = new Vector3(10f, 0f, 10f);
     public float wanderSpeed = 1.5f;
@@ -33,10 +35,10 @@ public class AiPerson : MonoBehaviour
             rb = gameObject.AddComponent<Rigidbody>();
 
         if (player == null)
-            player = FindObjectOfType<Player>();
+            player = FindObjectOfType<Player>(); // Đổi từ Player thành ThirdPersonController
 
         if (player == null)
-            Debug.LogWarning("AiPerson: không tìm thấy Player trong scene.");
+            Debug.LogWarning("AiPerson: không tìm thấy ThirdPersonController trong scene.");
 
         slippersRemaining = maxThrownSlippers;
         ChooseWanderTarget();
@@ -162,7 +164,7 @@ public class AiPerson : MonoBehaviour
         attackTimer = attackCooldown;
         if (player != null)
         {
-            player.TakeDamage(10);
+            player.TakeDamage(10); // Gọi hàm TakeDamage nhận sát thương từ code của bạn
             Debug.Log("Person đánh trúng chó và trừ máu.");
         }
     }

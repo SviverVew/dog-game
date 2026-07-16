@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
+using StarterAssets; // Thêm dòng này để nhận diện class ThirdPersonController mới
 
 public class IntroCinematic : MonoBehaviour
 {
@@ -14,12 +15,12 @@ public class IntroCinematic : MonoBehaviour
     [Header("Thời gian đứng lại ở mỗi chiếc dép (giây)")]
     public float viewDuration = 2f;
 
-    private Player playerScript;
+    private Player playerScript; 
 
     void Start()
     {
         // Tìm script di chuyển của người chơi để khóa lại lúc đang xem phim
-        playerScript = FindObjectOfType<Player>();
+        playerScript = FindObjectOfType<Player>(); // Đổi từ Player thành ThirdPersonController
 
         if (playerScript != null)
         {
