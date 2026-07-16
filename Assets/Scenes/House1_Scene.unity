@@ -5150,6 +5150,8 @@ MonoBehaviour:
   mouthPoint: {fileID: 1432399063}
   promptText: {fileID: 334750380}
   promptRadius: 2
+  animator: {fileID: 0}
+  eatStateName: EatingStart
 --- !u!136 &381271516
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -14564,6 +14566,8 @@ MonoBehaviour:
   mouthPoint: {fileID: 1862297252}
   promptText: {fileID: 334750380}
   promptRadius: 2
+  animator: {fileID: 1505069221}
+  eatStateName: EatingStart
 --- !u!114 &1041848625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31191,6 +31195,8 @@ MonoBehaviour:
   mouthPoint: {fileID: 1432399063}
   promptText: {fileID: 334750380}
   promptRadius: 2
+  animator: {fileID: 0}
+  eatStateName: EatingStart
 --- !u!114 &2056573278
 MonoBehaviour:
   m_ObjectHideFlags: 0

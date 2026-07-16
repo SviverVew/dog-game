@@ -10,43 +10,49 @@ public class DogAction : MonoBehaviour
     public float promptRadius = 2f;
 
     [Header("Animation Settings")]
-    [Tooltip("Kéo thả Animator của mô hình con vào đây. Nếu để trống, code sẽ tự tìm ở các Object con.")]
+    [Tooltip("Kéo thả CHÍNH XÁC Thằng Con (chứa Animator) vào đây.")]
     [SerializeField] private Animator animator;
-    [SerializeField] private string eatStateName = "EatingStart";
-    // Hash ID để tối ưu hóa hiệu năng thay vì gọi chuỗi String liên tục
-    private int _animIDEatTrigger; 
+    private int _animIDIsEatingBool; 
+
+    [Tooltip("Thời gian trễ (giây) tính từ lúc ấn E cúi đầu cho đến khi mồm chạm dép để ngậm lên.")]
+    [SerializeField] private float pickUpDelay = 0.45f; 
 
     private Slipper currentSlipper;
     public bool IsHoldingSlipper => currentSlipper != null;
+    
+    // Biến trạng thái để chặn người chơi spam E liên tục khi đang diễn hoạt ảnh nhặt
+    private bool isPickingUpInProgress = false; 
+
     private bool awaitingDropConfirmation = false;
     private float dropConfirmDuration = 2f;
     private Coroutine dropConfirmCoroutine = null;
 
     private void Start()
     {
-        // Nếu chưa kéo Animator ngoài Inspector, tự động tìm ở các con
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
         }
 
-        // Đăng ký ID tham số Animator Trigger tên là "Eat"
-        _animIDEatTrigger = Animator.StringToHash("Eat"); 
+        _animIDIsEatingBool = Animator.StringToHash("Eat"); 
     }
 
     void Update()
     {
         UpdatePrompt();
 
+        // Chặn không cho bấm nút hành động nếu đang trong quá trình chuyển giao nhặt dép
+        if (isPickingUpInProgress) return;
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (currentSlipper == null)
             {
-                PickUpSlipper();
+                // Bắt đầu tiến trình nhặt dép có chờ đợi animation
+                StartCoroutine(PickUpSlipperRoutine());
             }
             else
             {
-                // Nếu đang ngậm dép, nhấn E lần đầu để xác nhận chuẩn bị thả
                 if (!awaitingDropConfirmation)
                 {
                     awaitingDropConfirmation = true;
@@ -63,16 +69,18 @@ public class DogAction : MonoBehaviour
 
     void UpdatePrompt()
     {
-        if (promptText == null)
+        if (promptText == null) return;
+
+        // Nếu đang bận cúi đầu nhặt dép thì ẩn tạm prompt đi cho sạch màn hình
+        if (isPickingUpInProgress)
+        {
+            HidePrompt();
             return;
+        }
 
         if (currentSlipper == null)
         {
-            Collider[] colliders = Physics.OverlapSphere(
-                transform.position,
-                promptRadius
-            );
-
+            Collider[] colliders = Physics.OverlapSphere(transform.position, promptRadius);
             bool found = false;
 
             foreach (Collider col in colliders)
@@ -85,17 +93,13 @@ public class DogAction : MonoBehaviour
                 }
             }
 
-            if (found)
-                ShowPrompt("Nhấn E để nhặt dép");
-            else
-                HidePrompt();
+            if (found) ShowPrompt("Nhấn E để nhặt dép");
+            else HidePrompt();
         }
         else
         {
-            if (awaitingDropConfirmation)
-                ShowPrompt("Nhấn E lần nữa để thả dép");
-            else
-                ShowPrompt("Nhấn E để thả dép");
+            if (awaitingDropConfirmation) ShowPrompt("Nhấn E lần nữa để thả dép");
+            else ShowPrompt("Nhấn E để thả dép");
         }
     }
 
@@ -112,76 +116,83 @@ public class DogAction : MonoBehaviour
         promptText.gameObject.SetActive(false);
     }
 
-    void PickUpSlipper()
+    // Coroutine xử lý: Diễn hoạt ảnh trước -> Chờ chạm đất -> Ngậm dép lên mồm
+    IEnumerator PickUpSlipperRoutine()
     {
-        if (currentSlipper != null)
-            return;
-
         Collider[] colliders = Physics.OverlapSphere(transform.position, promptRadius);
+        Slipper targetSlipper = null;
 
+        // Tìm chiếc dép hợp lệ gần nhất trước khi bắt đầu cúi đầu
         foreach (Collider col in colliders)
         {
             Slipper slipper = col.GetComponent<Slipper>();
-
             if (slipper != null && !slipper.isPickedUp)
             {
-                currentSlipper = slipper;
-                slipper.isPickedUp = true;
-
-                // XÓA TAG "Collected" ngay khi nhặt lên
-                if (col.gameObject.CompareTag("Collected"))
-                {
-                    col.gameObject.tag = "Untagged";
-                }
-
-                // Tắt Collider để tránh lỗi vật lý xung đột với chó
-                Collider slipperCol = slipper.GetComponent<Collider>();
-                if (slipperCol != null)
-                {
-                    slipperCol.enabled = false;
-                }
-
-                // Cấu hình Rigidbody dép về Kinematic
-                Rigidbody rb = slipper.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.isKinematic = true;
-                    rb.linearVelocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-                    rb.detectCollisions = false;
-                }
-
-                // Gắn vào mồm chó
-                slipper.transform.SetParent(mouthPoint, false);
-                slipper.transform.localPosition = Vector3.zero;
-                slipper.transform.localRotation = Quaternion.identity;
-
-                // Chỉ chạy animation Eat khi nhặt dép thành công bằng phím E
-                PlayEatAnimation();
-
+                targetSlipper = slipper;
                 break;
             }
         }
-    }
 
-    void PlayEatAnimation()
-    {
-        if (animator == null)
-            return;
+        // Nếu không có dép ở gần thì không làm gì cả
+        if (targetSlipper == null) yield break;
 
-        animator.ResetTrigger(_animIDEatTrigger);
-        animator.SetTrigger(_animIDEatTrigger);
+        // Bắt đầu quá trình nhặt (Khóa phím E tạm thời)
+        isPickingUpInProgress = true;
 
-        if (!string.IsNullOrEmpty(eatStateName))
+        // 1. KÍCH HOẠT ANIMATION ĂN (Chú chó bắt đầu cúi đầu xuống)
+        if (animator != null)
         {
-            animator.CrossFade(eatStateName, 0.05f, 0);
+            animator.SetBool(_animIDIsEatingBool, true);
         }
+
+        // 2. CHỜ hoạt ảnh cúi đầu diễn ra đạt tới điểm mồm chạm đất
+        yield return new WaitForSeconds(pickUpDelay);
+
+        // Kiểm tra lại lần nữa phòng trường hợp chiếc dép bị biến mất/ai đó nhặt mất trong lúc chờ
+        if (targetSlipper != null && !targetSlipper.isPickedUp)
+        {
+            currentSlipper = targetSlipper;
+            currentSlipper.isPickedUp = true;
+
+            if (currentSlipper.gameObject.CompareTag("Collected"))
+            {
+                currentSlipper.gameObject.tag = "Untagged";
+            }
+
+            // Tắt Collider & Rigidbody vật lý
+            Collider slipperCol = currentSlipper.GetComponent<Collider>();
+            if (slipperCol != null) slipperCol.enabled = false;
+
+            Rigidbody rb = currentSlipper.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.detectCollisions = false;
+            }
+
+            // 3. CHÍNH THỨC HÚT DÉP VÀO MỒM
+            currentSlipper.transform.SetParent(mouthPoint, false);
+            currentSlipper.transform.localPosition = Vector3.zero;
+            currentSlipper.transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            // Nếu có lỗi xảy ra không ngậm được dép, trả trạng thái animation về bình thường
+            if (animator != null)
+            {
+                animator.SetBool(_animIDIsEatingBool, false);
+            }
+        }
+
+        // Mở khóa phím E
+        isPickingUpInProgress = false;
     }
 
     void DropSlipper()
     {
-        if (currentSlipper == null)
-            return;
+        if (currentSlipper == null) return;
 
         if (dropConfirmCoroutine != null)
         {
@@ -190,18 +201,19 @@ public class DogAction : MonoBehaviour
         }
         awaitingDropConfirmation = false;
 
-        // Gỡ dép ra khỏi mồm chó
+        if (animator != null)
+        {
+            animator.SetBool(_animIDIsEatingBool, false);
+        }
+
         currentSlipper.transform.SetParent(null);
         currentSlipper.isPickedUp = false;
 
-        // Khôi phục vật lý
         Rigidbody rb = currentSlipper.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.isKinematic = false;
             rb.detectCollisions = true;
-            
-            // Hất nhẹ chiếc dép về phía trước
             rb.AddForce(transform.forward * 3f + Vector3.up * 1.5f, ForceMode.Impulse);
         }
 
