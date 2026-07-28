@@ -48,3 +48,6 @@ sysinfo.txt
 .Trashes
 ehthumbs.db
 Thumbs.db
+Render Game/*.app
+*.app
+Render Game/
