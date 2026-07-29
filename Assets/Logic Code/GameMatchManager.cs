@@ -30,6 +30,7 @@ public class GameMatchManager : NetworkBehaviour
     }
 
     // Hàm này CHỈ ĐƯỢC GỌI BỞI HOST/SERVER
+    // Hàm này CHỈ ĐƯỢC GỌI BỞI HOST/SERVER
     public void StartMatchAndAssignRoles()
     {
         if (!IsServer) return;
@@ -38,10 +39,10 @@ public class GameMatchManager : NetworkBehaviour
 
         if (connectedClients.Count == 0) return;
 
-        // 1. Tạo danh sách ngẫu nhiên các Role (ví dụ 6 người -> 3 Dog, 3 Person)
+        // 1. Tạo danh sách ngẫu nhiên các Role (ví dụ 4 người -> 2 Dog, 2 Person)
         List<PlayerRole> rolesToAssign = new List<PlayerRole>();
         
-        int dogCount = connectedClients.Count / 2; // Ví dụ 6 người thì 3 chó, 3 người
+        int dogCount = connectedClients.Count / 2;
         int personCount = connectedClients.Count - dogCount;
 
         for (int i = 0; i < dogCount; i++) rolesToAssign.Add(PlayerRole.Dog);
@@ -67,32 +68,53 @@ public class GameMatchManager : NetworkBehaviour
 
             playerRoles[clientId] = assignedRole;
 
-            // Xóa nhân vật mặc định cũ nếu NetworkManager lỡ Spawn sẵn
-            if (NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject != null)
+            // 🚨 BƯỚC 1: Xóa con cũ ĐÚNG CHUẨN NETCODE (Despawn trước khi Destroy)
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
             {
-                Destroy(NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject);
+                if (client.PlayerObject != null)
+                {
+                    var oldNetObj = client.PlayerObject;
+                    oldNetObj.Despawn(true); // Despawn và Destroy luôn object cũ
+                }
             }
 
-            // Chọn Prefab & Vị trí Spawn
+            // 🚨 BƯỚC 2: Tính toán vị trí & Góc xoay Spawn chuẩn
             GameObject prefabToSpawn = (assignedRole == PlayerRole.Dog) ? dogPrefab : personPrefab;
             Vector3 spawnPos = Vector3.zero;
+            Quaternion spawnRot = Quaternion.identity;
 
-            if (assignedRole == PlayerRole.Dog && dogSpawnPoints.Length > 0)
+            if (assignedRole == PlayerRole.Dog && dogSpawnPoints != null && dogSpawnPoints.Length > 0)
             {
-                spawnPos = dogSpawnPoints[dogSpawnIdx % dogSpawnPoints.Length].position;
+                Transform sp = dogSpawnPoints[dogSpawnIdx % dogSpawnPoints.Length];
+                if (sp != null)
+                {
+                    spawnPos = sp.position;
+                    spawnRot = sp.rotation;
+                }
                 dogSpawnIdx++;
             }
-            else if (assignedRole == PlayerRole.Person && personSpawnPoints.Length > 0)
+            else if (assignedRole == PlayerRole.Person && personSpawnPoints != null && personSpawnPoints.Length > 0)
             {
-                spawnPos = personSpawnPoints[personSpawnIdx % personSpawnPoints.Length].position;
+                Transform sp = personSpawnPoints[personSpawnIdx % personSpawnPoints.Length];
+                if (sp != null)
+                {
+                    spawnPos = sp.position;
+                    spawnRot = sp.rotation;
+                }
                 personSpawnIdx++;
             }
 
-            // Spawn nhân vật qua mạng cho Client tương ứng
-            GameObject playerInstance = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
-            playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            // 🚨 BƯỚC 3: Instantiate tại đúng Position và Rotation
+            GameObject playerInstance = Instantiate(prefabToSpawn, spawnPos, spawnRot);
+            
+            // Spawn qua mạng cho Client
+            NetworkObject netObj = playerInstance.GetComponent<NetworkObject>();
+            if (netObj != null)
+            {
+                netObj.SpawnAsPlayerObject(clientId, true);
+            }
 
-            Debug.Log($"Client [{clientId}] được phân Role: {assignedRole}");
+            Debug.Log($"<color=green>[Match] Client [{clientId}] Spawn tại: {spawnPos} với Role: {assignedRole}</color>");
         }
     }
 }

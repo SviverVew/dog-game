@@ -19,8 +19,8 @@ GameObject:
   - component: {fileID: 8592298495653870295}
   - component: {fileID: 2500827574027991762}
   - component: {fileID: 2457292182595865710}
-  - component: {fileID: 216228089424363221}
   - component: {fileID: 7632097608876591105}
+  - component: {fileID: 216228089424363221}
   - component: {fileID: -8503742450056932382}
   - component: {fileID: 2799997794310460738}
   m_Layer: 8
@@ -410,6 +410,31 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7632097608876591105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2493638908559561170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 782141349
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &216228089424363221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -422,6 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537f8d47922f34ecea37614105f8593e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarterAssets.Player
+  ShowTopMostFoldoutHeaderGroup: 1
   _animator: {fileID: 7681370586855874115}
   moveSpeed: 5
   sprintSpeed: 8
@@ -450,31 +476,6 @@ MonoBehaviour:
   barkLimit: 3
   barkWindow: 5
   barkPenaltyCooldown: 5
---- !u!114 &7632097608876591105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2493638908559561170}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 782141349
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &-8503742450056932382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,6 +536,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerNetworkCameraSetup
   ShowTopMostFoldoutHeaderGroup: 1
   cameraTarget: {fileID: 3237412346564997798}
+  scriptsToDisableIfNotOwner:
+  - {fileID: 8592298495653870295}
+  - {fileID: 216228089424363221}
+  - {fileID: 2500827574027991762}
+  - {fileID: 861750525250037201}
+  - {fileID: 5327193916108268008}
 --- !u!1 &4185483809286827380
 GameObject:
   m_ObjectHideFlags: 0

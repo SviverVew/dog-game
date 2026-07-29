@@ -47,15 +47,6 @@ public class PersonPlayer : NetworkBehaviour
     {
         rb = GetComponent<Rigidbody>();
         _input = GetComponent<StarterAssetsInputs>();
-        
-        if (_mainCamera == null)
-        {
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-        }
-        if (_mainCamera != null)
-        {
-            mainCameraTransform = _mainCamera.transform;
-        }
     }
 
     public override void OnNetworkSpawn()
@@ -85,8 +76,15 @@ public class PersonPlayer : NetworkBehaviour
         if (throwOrigin == null) throwOrigin = transform;
 
         AssignAnimationIDs();
+        StartCoroutine(FindMainCamera());
     }
+    private IEnumerator FindMainCamera()
+    {
+        while (Camera.main == null)
+            yield return null;
 
+        mainCameraTransform = Camera.main.transform;
+    }
     private void Update()
     {
         // RẤT QUAN TRỌNG: Chỉ xử lý bấm phím ở máy của người chơi này
@@ -98,11 +96,17 @@ public class PersonPlayer : NetworkBehaviour
         HandleActions();
     }
 
-    private void FixedUpdate()
+   private void FixedUpdate()
+{
+    // Chỉ xử lý di chuyển ở máy sở hữu character này
+    if (!IsOwner) return;
+
+    // Kiểm tra an toàn trước khi gọi hàm di chuyển
+    if (_input != null && rb != null)
     {
-        if (!IsOwner) return;
         MovePlayer();
     }
+}
 
     private void AssignAnimationIDs()
     {
@@ -136,8 +140,10 @@ public class PersonPlayer : NetworkBehaviour
     private void MovePlayer()
     {
         bool hasMovementInput = moveDirection.sqrMagnitude > 0.001f;
-        // Giữ Phím Sprint (Shift) để Chạy Nhanh, thả ra thì Đi Bộ
-        float targetSpeed = _input.sprint ? runSpeed : walkSpeed;
+        
+        // 🟢 FIX LỖI NULL AT LINE 135: Kiểm tra null _input trước khi lấy nút sprint
+        bool isSprinting = (_input != null) ? _input.sprint : false;
+        float targetSpeed = isSprinting ? runSpeed : walkSpeed;
 
         if (!hasMovementInput)
         {
@@ -151,11 +157,11 @@ public class PersonPlayer : NetworkBehaviour
 
         // Cập nhật Vận tốc Rigidbody
         Vector3 velocity = moveDirection * currentSpeed;
-#if UNITY_6000_0_OR_NEWER
+    #if UNITY_6000_0_OR_NEWER
         rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
-#else
+    #else
         rb.velocity = new Vector3(velocity.x, rb.velocity.y, velocity.z);
-#endif
+    #endif
 
         // Xoay nhân vật theo hướng di chuyển
         if (hasMovementInput)
@@ -164,14 +170,13 @@ public class PersonPlayer : NetworkBehaviour
             rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
         }
 
-        // Cập nhật Animation Speed (Blend Tree)
-        if (_hasAnimator)
+        // Cập nhật Animation Speed
+        if (_hasAnimator && animator != null)
         {
             animator.SetFloat(animIDSpeed, currentSpeed);
             animator.SetFloat(animIDMotionSpeed, 1f);
         }
     }
-
     // --- XỬ LÝ HÀNH ĐỘNG (ĐÁNH, NHẶT, NÉM DÉP) ---
     private void HandleActions()
     {

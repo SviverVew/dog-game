@@ -42,12 +42,19 @@ public class LobbyUIController : NetworkBehaviour
 
     private void Update()
     {
-        // ⌨️ BẮT SỰ KIỆN PHÍM ENTER / RETURN
+        // Bắt sự kiện ENTER từ Host
         if (isInLobby && NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
         {
+            // Nhận cả Enter phím chính lẫn Numpad Enter
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
             {
-                Debug.Log("<color=yellow>[Lobby] Đã nhận thao tác bấm ENTER từ Host!</color>");
+                // Bỏ Focus khỏi các Input Field để không bị nuốt phím
+                if (UnityEngine.EventSystems.EventSystem.current != null)
+                {
+                    UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+                }
+
+                Debug.Log("<color=yellow>[Lobby] Đã nhận phím ENTER trên bản Build!</color>");
                 StartGameLogic();
             }
         }
@@ -149,29 +156,33 @@ public class LobbyUIController : NetworkBehaviour
     }
 
     // Logic Bắt Đầu Game
+    // Logic Bắt Đầu Game
     private void StartGameLogic()
     {
         if (!NetworkManager.Singleton.IsHost) return;
-        HideLobbyUIClientRpc();
 
         int currentPlayers = NetworkManager.Singleton.ConnectedClientsIds.Count;
 
-        // 📌 ĐIỀU KIỆN SỐ LƯỢNG NGƯỜI CHƠI (Nếu muốn test 1 mình thì đổi số 2 thành 1)
+        // 📌 ĐIỀU KIỆN SỐ LƯỢNG NGƯỜI CHƠI (Để = 1 nếu muốn test 1 mình, để = 2 khi test 2 máy)
         if (currentPlayers < 2)
         {
             Debug.LogWarning($"[Lobby] Chưa đủ người chơi! Đang có {currentPlayers}/4. Cần ít nhất 2 người!");
             return;
         }
 
-        Debug.Log("<color=green>[Lobby] Đủ điều kiện! Đang bắt đầu Game...</color>");
+        Debug.Log("<color=green>[Lobby] Đủ điều kiện! Đang bắt đầu Game và Phân Role...</color>");
 
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == inGameSceneName)
+        // 1. Gửi lệnh ẩn UI Lobby cho toàn bộ Client
+        HideLobbyUIClientRpc();
+
+        // 2. Ra lệnh cho GameMatchManager thực hiện Phân Role & Spawn nhân vật đúng vị trí!
+        if (GameMatchManager.Instance != null)
         {
-            HideLobbyUIClientRpc();
+            GameMatchManager.Instance.StartMatchAndAssignRoles();
         }
         else
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(inGameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            Debug.LogError("[Lobby] Không tìm thấy GameMatchManager trong Scene!");
         }
     }
 

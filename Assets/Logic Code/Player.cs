@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.Netcode;
 
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
@@ -14,7 +15,7 @@ namespace StarterAssets
 #if ENABLE_INPUT_SYSTEM 
     [RequireComponent(typeof(PlayerInput))]
 #endif
-    public class Player : MonoBehaviour
+    public class Player : NetworkBehaviour
     {
         [Header("References")]
         private Rigidbody rb;
@@ -119,14 +120,7 @@ namespace StarterAssets
 
         private void Awake()
         {
-            if (_mainCamera == null)
-            {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-            }
-            if (_mainCamera != null)
-            {
-                mainCameraTransform = _mainCamera.transform;
-            }
+            StartCoroutine(FindMainCamera());
         }
 
         private void Start()
@@ -176,6 +170,9 @@ namespace StarterAssets
 
         private void Update()
         {
+            if (!IsOwner)
+            return;
+
             _hasAnimator = _animator != null;
             isGrounded = CheckGrounded();
 
@@ -217,12 +214,18 @@ namespace StarterAssets
 
         private void FixedUpdate()
         {
+            if (!IsOwner)
+                return;
+
             MovePlayer();
-            ApplyExtraGravity(); 
+            ApplyExtraGravity();
         }
 
         private void LateUpdate()
         {
+            if (!IsOwner)
+                return;
+
             CameraRotation();
         }
 
@@ -262,7 +265,13 @@ namespace StarterAssets
             }
 
         }
+        private IEnumerator FindMainCamera()
+        {
+            while (Camera.main == null)
+                yield return null;
 
+            mainCameraTransform = Camera.main.transform;
+        }
         private void UpdateMovementAnimation(bool isMoving)
         {
             if (!_hasAnimator || isMoving == _wasMoving) return;
@@ -533,6 +542,28 @@ namespace StarterAssets
             if (animationEvent.animatorClipInfo.weight > 0.5f && landingAudioClip != null)
             {
                 audioSource.PlayOneShot(landingAudioClip, footstepAudioVolume);
+            }
+        }
+        public override void OnNetworkSpawn()
+{
+            if (IsOwner)
+            {
+                if (TryGetComponent<PlayerInput>(out var pi))
+                    pi.enabled = true;
+
+                if (TryGetComponent<StarterAssetsInputs>(out var input))
+                    input.enabled = true;
+            }
+            else
+            {
+                if (TryGetComponent<PlayerInput>(out var pi))
+                    pi.enabled = false;
+
+                if (TryGetComponent<StarterAssetsInputs>(out var input))
+                    input.enabled = false;
+
+                if (TryGetComponent<AudioListener>(out var audio))
+                    audio.enabled = false;
             }
         }
     }
