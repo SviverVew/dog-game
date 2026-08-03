@@ -75,6 +75,7 @@ public class GameMatchManager : NetworkBehaviour
                 {
                     var oldNetObj = client.PlayerObject;
                     oldNetObj.Despawn(true); // Despawn và Destroy luôn object cũ
+                    Debug.Log($"[Match] Đã Despawn PlayerObject cũ cho client {clientId}");
                 }
             }
 
@@ -105,13 +106,24 @@ public class GameMatchManager : NetworkBehaviour
             }
 
             // 🚨 BƯỚC 3: Instantiate tại đúng Position và Rotation
+            if (prefabToSpawn == null)
+            {
+                Debug.LogError($"[Match] Prefab to spawn is null for role {assignedRole} (client {clientId}). Skipping.");
+                continue;
+            }
+
             GameObject playerInstance = Instantiate(prefabToSpawn, spawnPos, spawnRot);
-            
+
             // Spawn qua mạng cho Client
             NetworkObject netObj = playerInstance.GetComponent<NetworkObject>();
             if (netObj != null)
             {
                 netObj.SpawnAsPlayerObject(clientId, true);
+                Debug.Log($"[Match] Spawned NetworkObject (id={netObj.NetworkObjectId}) for client {clientId}");
+            }
+            else
+            {
+                Debug.LogError($"[Match] Prefab {prefabToSpawn.name} does not contain a NetworkObject component!");
             }
 
             Debug.Log($"<color=green>[Match] Client [{clientId}] Spawn tại: {spawnPos} với Role: {assignedRole}</color>");

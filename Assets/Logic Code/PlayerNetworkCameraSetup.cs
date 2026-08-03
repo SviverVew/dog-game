@@ -1,6 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Cinemachine; // Hoặc Cinemachine nếu dùng v2 cũ
+using Unity.Cinemachine; // Standard namespace cho Cinemachine v3
 using UnityEngine.InputSystem;
 
 public class PlayerNetworkCameraSetup : NetworkBehaviour
@@ -9,17 +9,13 @@ public class PlayerNetworkCameraSetup : NetworkBehaviour
     public Transform cameraTarget;
 
     [Header("2. Kéo tất cả Script di chuyển & Input vào đây")]
-    public Behaviour[] scriptsToDisableIfNotOwner; // Ví dụ: PersonPlayer, Player, StarterAssetsInputs,...
+    public Behaviour[] scriptsToDisableIfNotOwner; 
 
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
-            // ==========================================
-            // LÀ MÁY CỦA MÌNH (IsOwner = true)
-            // ==========================================
-
-            // 1. Bật tất cả script di chuyển & input của máy mình
+            // Bật tất cả script di chuyển & input cho máy LOCAL
             foreach (var script in scriptsToDisableIfNotOwner)
             {
                 if (script != null) script.enabled = true;
@@ -30,16 +26,11 @@ public class PlayerNetworkCameraSetup : NetworkBehaviour
                 pInput.enabled = true;
             }
 
-            // 2. Ép Camera trên Scene CHỈ FOLLOW theo nhân vật của máy mình
             SetupLocalCamera();
         }
         else
         {
-            // ==========================================
-            // LÀ MÁY ĐỐI PHƯƠNG (IsOwner = false)
-            // ==========================================
-
-            // 🚨 TẮT SẠCH Input & Di chuyển của đối phương để không bị ăn chung Input
+            // Tắt input của đối phương để không ăn chung phím
             foreach (var script in scriptsToDisableIfNotOwner)
             {
                 if (script != null) script.enabled = false;
@@ -47,10 +38,9 @@ public class PlayerNetworkCameraSetup : NetworkBehaviour
 
             if (TryGetComponent<PlayerInput>(out var pInput))
             {
-                pInput.enabled = false; // Tắt hoàn toàn PlayerInput đối phương
+                pInput.enabled = false;
             }
 
-            // Tắt AudioListener của đối phương nếu có
             if (TryGetComponent<AudioListener>(out var audioList))
             {
                 audioList.enabled = false;
@@ -63,30 +53,37 @@ public class PlayerNetworkCameraSetup : NetworkBehaviour
         if (cameraTarget == null)
             cameraTarget = transform;
 
-        var vcam = FindFirstObjectByType<CinemachineCamera>();
+        // Cinemachine v3: Tìm component CinemachineCamera
+        CinemachineCamera vcam = FindFirstObjectByType<CinemachineCamera>();
 
         if (vcam == null)
         {
-            Debug.LogError("Không tìm thấy CinemachineCamera!");
+            Debug.LogError("Không tìm thấy CinemachineCamera trong Scene!");
             return;
         }
 
-        vcam.Follow = cameraTarget;
-        vcam.LookAt = cameraTarget;
+        // Cinemachine v3 gán Target thông qua Target.TrackingTarget
+        vcam.Target.TrackingTarget = cameraTarget;
+        vcam.Target.LookAtTarget = cameraTarget;
+
+        // Ưu tiên cao nhất cho máy local
+        vcam.Priority.Value = 100;
 
         Camera mainCam = Camera.main;
-
         if (mainCam != null)
         {
-            AudioListener[] listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
-
+            var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
             foreach (var l in listeners)
+            {
+                if (l == null) continue;
+                if (l.gameObject == mainCam.gameObject) continue;
                 l.enabled = false;
+            }
 
             if (mainCam.TryGetComponent<AudioListener>(out var audio))
                 audio.enabled = true;
         }
 
-        Debug.Log($"Camera Follow -> {gameObject.name}");
+        Debug.Log($"[v3 Camera Setup] Camera Follow -> {gameObject.name}");
     }
 }

@@ -51,19 +51,32 @@ public class PersonPlayer : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Nếu KHÔNG PHẢI là máy local sở hữu người chơi này -> Tắt AudioListener thừa
-        if (!IsOwner)
+        if (IsOwner)
         {
-            AudioListener audioListener = GetComponent<AudioListener>();
-            if (audioListener != null) audioListener.enabled = false;
-        }
-        else
-        {
+            // 1. Bật PlayerInput và StarterAssetsInputs khi đúng là máy chính chủ
+            if (TryGetComponent<UnityEngine.InputSystem.PlayerInput>(out var pi))
+                pi.enabled = true;
+
+            if (TryGetComponent<StarterAssetsInputs>(out var input))
+                input.enabled = true;
+
+            // 2. Khóa con trỏ chuột để xoay góc nhìn
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-    }
+        else
+        {
+            // Tắt ở các máy đối phương để tránh ăn chung phím
+            if (TryGetComponent<UnityEngine.InputSystem.PlayerInput>(out var pi))
+                pi.enabled = false;
 
+            if (TryGetComponent<StarterAssetsInputs>(out var input))
+                input.enabled = false;
+
+            AudioListener audioListener = GetComponent<AudioListener>();
+            if (audioListener != null) audioListener.enabled = false;
+        }
+    }
     private void Start()
     {
         if (animator == null) animator = GetComponentInChildren<Animator>();

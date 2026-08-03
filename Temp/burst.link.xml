@@ -1,0 +1,186 @@
+<linker>
+ <assembly fullname="Unity.Burst">
+  <type fullname="Unity.Burst.LowLevel.BurstCompilerService">
+   <method name="GetOrCreateSharedMemory"/>
+  </type>
+  <type fullname="Unity.Burst.LowLevel.BurstCompilerService">
+   <method name="RuntimeLog"/>
+  </type>
+ </assembly>
+ <assembly fullname="Unity.Collections">
+  <type fullname="Unity.Collections.AllocatorManager">
+   <method name=".cctor"/>
+  </type>
+  <type fullname="Unity.Collections.AllocatorManager.SharedStatics.TableEntry">
+   <method name=".cctor"/>
+  </type>
+  <type fullname="Unity.Jobs.LowLevel.Unsafe.JobsUtility">
+   <method name="get_ThreadIndexCount"/>
+  </type>
+  <type fullname="Unity.Collections.LowLevel.Unsafe.UnsafeUtility">
+   <method name="MallocTracked"/>
+  </type>
+  <type fullname="Unity.Collections.LowLevel.Unsafe.UnsafeUtility">
+   <method name="FreeTracked"/>
+  </type>
+  <type fullname="Unity.Collections.AllocatorManager.SharedStatics.IsAutoDispose">
+   <method name=".cctor"/>
+  </type>
+ </assembly>
+ <assembly fullname="Unity.Networking.Transport">
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_ErrorState_Explain"/>
+  </type>
+  <type fullname="Unity.Collections.LowLevel.Unsafe.UnsafeUtility">
+   <method name="Malloc"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_get_state"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_create"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_init"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_destroy"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_get_role"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_read_data"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_get_errorsState"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_get_handshake_state"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_handshake"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_NetworkAddress_HostnameLookupCheckStatus"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_NetworkAddress_HostnameLookup"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_Poll"/>
+  </type>
+  <type fullname="Unity.TLS.LowLevel.Binding">
+   <method name="unitytls_client_send_data"/>
+  </type>
+  <type fullname="Unity.Networking.Transport.Utilities.RandomHelpers">
+   <method name=".cctor"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Timer_GetHighPrecisionTimerTicks"/>
+  </type>
+ </assembly>
+ <assembly fullname="Unity.RenderPipelines.Universal.Runtime">
+  <type fullname="UnityEngine.Rendering.Universal.DecalUpdateCachedSystem.UpdateTransformsJob">
+   <method name=".cctor"/>
+  </type>
+ </assembly>
+ <assembly fullname="UnityEngine.CoreModule">
+  <type fullname="Unity.Jobs.LowLevel.Unsafe.JobsUtility">
+   <method name="GetWorkStealingRange"/>
+  </type>
+  <type fullname="Unity.Collections.LowLevel.Unsafe.UnsafeUtility">
+   <method name="FreeTracked"/>
+  </type>
+  <type fullname="Unity.Collections.LowLevel.Unsafe.UnsafeUtility">
+   <method name="MallocTracked"/>
+  </type>
+  <type fullname="UnityEngine.Rendering.GPUDrivenProcessor">
+   <method name="ClassifyMaterialsImpl_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_ProcessRecv_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_DequeueRecv_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_GetNetworkAddress_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_ScheduleRecv_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Endpoint_GetNetworkAddress_Injected"/>
+  </type>
+  <type fullname="UnityEngine.Rendering.BatchRendererGroup">
+   <method name="OcclusionTestAABB_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_TCP_Accept_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_GetAddress_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_Close_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_TCP_Recv_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_Create_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_TCP_Connect_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_Socket_TCP_Send_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_ScheduleSend_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Endpoint_Create_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_ProcessSend_Injected"/>
+  </type>
+  <type fullname="Unity.Baselib.LowLevel.Binding">
+   <method name="Baselib_RegisteredNetwork_Socket_UDP_DequeueSend_Injected"/>
+  </type>
+  <type fullname="UnityEngine.U2D.Clipper2D">
+   <method name="Internal_Execute_Cleanup"/>
+  </type>
+  <type fullname="UnityEngine.U2D.ClipperOffset2D">
+   <method name="Internal_Execute"/>
+  </type>
+  <type fullname="UnityEngine.U2D.ClipperOffset2D">
+   <method name="Internal_Execute_Cleanup"/>
+  </type>
+  <type fullname="UnityEngine.U2D.Clipper2D">
+   <method name="Internal_Execute_Injected"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccessArray">
+   <method name="GetSortedToUserIndex"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccessArray">
+   <method name="GetSortedTransformAccess"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccess">
+   <method name="GetPosition"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccess">
+   <method name="GetRotation"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccess">
+   <method name="GetLocalScale"/>
+  </type>
+  <type fullname="UnityEngine.Jobs.TransformAccess">
+   <method name="GetLocalToWorldMatrix"/>
+  </type>
+  <type fullname="UnityEngine.LightProbesQuery">
+   <method name="CalculateInterpolatedLightAndOcclusionProbes"/>
+  </type>
+ </assembly>
+</linker>
