@@ -151,45 +151,47 @@ public class PersonPlayer : NetworkBehaviour
     }
 
     private void MovePlayer()
-    {
-        bool hasMovementInput = moveDirection.sqrMagnitude > 0.001f;
-        
-        // 🟢 FIX LỖI NULL AT LINE 135: Kiểm tra null _input trước khi lấy nút sprint
-        bool isSprinting = (_input != null) ? _input.sprint : false;
-        float targetSpeed = isSprinting ? runSpeed : walkSpeed;
-
-        if (!hasMovementInput)
         {
-            targetSpeed = 0f;
-            currentSpeed = 0f;
-        }
-        else
-        {
-            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.fixedDeltaTime * 15f);
-        }
+            bool hasMovementInput = moveDirection.sqrMagnitude > 0.001f;
+            
+            bool isSprinting = (_input != null) ? _input.sprint : false;
+            float targetSpeed = isSprinting ? runSpeed : walkSpeed;
 
-        // Cập nhật Vận tốc Rigidbody
-        Vector3 velocity = moveDirection * currentSpeed;
-    #if UNITY_6000_0_OR_NEWER
-        rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
-    #else
-        rb.velocity = new Vector3(velocity.x, rb.velocity.y, velocity.z);
-    #endif
+            if (!hasMovementInput)
+            {
+                targetSpeed = 0f;
+                currentSpeed = 0f;
+            }
+            else
+            {
+                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, Time.fixedDeltaTime * 15f);
+            }
 
-        // Xoay nhân vật theo hướng di chuyển
-        if (hasMovementInput)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
-        }
+            // 🔴 FIX: Đánh thức Rigidbody nếu nó đang ở trạng thái Sleep
+            if (rb.IsSleeping()) rb.WakeUp();
 
-        // Cập nhật Animation Speed
-        if (_hasAnimator && animator != null)
-        {
-            animator.SetFloat(animIDSpeed, currentSpeed);
-            animator.SetFloat(animIDMotionSpeed, 1f);
+            // Cập nhật Vận tốc Rigidbody
+            Vector3 velocity = moveDirection * currentSpeed;
+        #if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = new Vector3(velocity.x, rb.linearVelocity.y, velocity.z);
+        #else
+            rb.velocity = new Vector3(velocity.x, rb.velocity.y, velocity.z);
+        #endif
+
+            // Xoay nhân vật theo hướng di chuyển
+            if (hasMovementInput)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            }
+
+            // Cập nhật Animation Speed
+            if (_hasAnimator && animator != null)
+            {
+                animator.SetFloat(animIDSpeed, currentSpeed);
+                animator.SetFloat(animIDMotionSpeed, 1f);
+            }
         }
-    }
     // --- XỬ LÝ HÀNH ĐỘNG (ĐÁNH, NHẶT, NÉM DÉP) ---
     private void HandleActions()
     {

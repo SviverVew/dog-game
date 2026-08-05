@@ -308,14 +308,28 @@ namespace StarterAssets
             }
         }
 
-        private bool CheckGrounded()
+       private bool CheckGrounded()
         {
             CapsuleCollider capsule = GetComponent<CapsuleCollider>();
-            Vector3 origin = transform.position + Vector3.up * (capsule.radius);
-            float radius = capsule.radius * 0.9f; 
-            float castDistance = capsule.radius + 0.1f;
+            if (capsule == null) return false;
 
-            return Physics.SphereCast(origin, radius, Vector3.down, out _, castDistance, groundLayer, QueryTriggerInteraction.Ignore);
+            // Lấy điểm thấp nhất của Capsule Collider ngoài Scene
+            Vector3 bottomCenter = capsule.bounds.center;
+            bottomCenter.y = capsule.bounds.min.y + 0.05f; // Đặt gốc bắn ray ở đáy chân
+
+            // Bắn một đường Raycast ngắn 0.15m xuống sàn
+            bool isGrounded = Physics.Raycast(
+                bottomCenter, 
+                Vector3.down, 
+                0.15f, 
+                groundLayer, 
+                QueryTriggerInteraction.Ignore
+            );
+
+            // Vẽ đường debug trên tab Scene (Màu xanh = Chạm đất, Đỏ = Đang lơ lửng)
+            Debug.DrawRay(bottomCenter, Vector3.down * 0.15f, isGrounded ? Color.green : Color.red);
+
+            return isGrounded;
         }
 
         private void CameraRotation()
