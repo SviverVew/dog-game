@@ -1173,3 +1173,204 @@ Received Import Request.
 Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1a12c3f8ec2c7597c2dc8128a6ccc74c') in 0.027910417 seconds
 Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
 
+========================================================================
+Received Prepare
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+Begin MonoManager ReloadAssembly
+[Licensing::Client] Successfully resolved entitlement details
+Thread 0x16f7a7000 may have been prematurely finalized
+Symbol file LoadedFromMemory is not a mono symbol file
+- Loaded All Assemblies, in  2.224 seconds
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+'Packages/com.unity.cinemachine/Editor/Obsolete/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+'Packages/com.unity.cinemachine/Editor/Editors/CinemachineVirtualCameraBaseEditor.cs' contains partial class of Unity.Object, exactly 1 of the partial classes needs to be in a file with the same filename. This is to know the one that can be referenced from ie. GameObjects
+Refreshing native plugins compatible for Editor in 1.11 ms, found 2 plugins.
+Native extension for OSXStandalone target not found
+Assembly reference Packages/com.unity.cinemachine/Editor/Samples/ExposeHDRPInternals/HDRP-Editor-ref.asmref has no target assembly definition
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+[Package Manager] Failed to launch server process. Reason: Unity was launched with the -noUpm command-line argument
+[Package Manager] Unable to send message (not connected to server process).
+[Package Manager] Cannot connect to Unity Package Manager local server
+Refreshing native plugins compatible for Editor in 1.14 ms, found 2 plugins.
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.705 seconds
+Domain Reload Profiling: 2937ms
+	BeginReloadAssembly (1040ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (45ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (2ms)
+		CreateAndSetChildDomain (204ms)
+	RebuildCommonClasses (39ms)
+	RebuildNativeTypeToScriptingClass (14ms)
+	initialDomainReloadingComplete (55ms)
+	LoadAllAssembliesAndSetupDomain (1084ms)
+		LoadAssemblies (1137ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (450ms)
+			TypeCache.Refresh (71ms)
+				TypeCache.ScanAssembly (3ms)
+			BuildScriptInfoCaches (361ms)
+			ResolveRequiredComponents (10ms)
+	FinalizeReload (705ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (594ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (1ms)
+			SetLoadedEditorAssemblies (4ms)
+			BeforeProcessingInitializeOnLoad (107ms)
+			ProcessInitializeOnLoadAttributes (282ms)
+			ProcessInitializeOnLoadMethodAttributes (199ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (7ms)
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+WARNING: Shader Unsupported: 'Universal Render Pipeline/VR/SpatialMapping/Wireframe' - All subshaders removed
+WARNING: Shader Did you use #pragma only_renderers and omit this platform?
+WARNING: Shader If subshaders removal was intentional, you may have forgotten turning Fallback off?
+Refreshing native plugins compatible for Editor in 0.88 ms, found 2 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 28 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 9454 unused Assets / (6.6 MB). Loaded Objects now: 10247.
+Memory consumption went from 206.9 MB to 200.3 MB.
+Total: 23.939709 ms (FindLiveObjects: 1.376584 ms CreateObjectMapping: 0.290750 ms MarkObjects: 18.935375 ms  DeleteObjects: 3.336292 ms)
+
+Prepare: number of updated asset objects reloaded= 0
+========================================================================
+Received Import Request.
+  Time since last request: 208.473997 seconds.
+  path: Assets/Scenes/House1_Scene 1.unity
+  artifactKey: Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/House1_Scene 1.unity using Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '7a4c4d391cdde7441ca87e57407f3623') in 0.003677 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.518544 seconds.
+  path: Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+  artifactKey: Guid(2e498d1c8094910479dc3e1b768306a4) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset using Guid(2e498d1c8094910479dc3e1b768306a4) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'd2853027e7f0b7b9acfca7026dc5f496') in 0.339790458 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 5
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000150 seconds.
+  path: Assets/Scenes/WaitingRoom.unity
+  artifactKey: Guid(3d3277dfd67f643a688967ffe8d04469) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/WaitingRoom.unity using Guid(3d3277dfd67f643a688967ffe8d04469) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'df72c615ba749b8e3212e5f85d624d49') in 0.02014475 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000101 seconds.
+  path: Assets/Logic Code/GameMatchManager.cs
+  artifactKey: Guid(5bcd5ef92badb384481970c9e3eb1335) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Logic Code/GameMatchManager.cs using Guid(5bcd5ef92badb384481970c9e3eb1335) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'e2c57bd0464dd1029e5b6616cf7a9d0d') in 0.010756375 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000048 seconds.
+  path: Assets/Scenes/House1_Scene 1.unity
+  artifactKey: Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene 1.unity using Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '72d9f303a259d83daf012429872be063') in 0.039701167 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.977692 seconds.
+  path: Assets/Scenes/House1_Scene Backup.unity
+  artifactKey: Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/House1_Scene Backup.unity using Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: '1336ba47f80c8020622259d223a1694f') in 0.008750291 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.808705 seconds.
+  path: Assets/Scenes/House1_Scene Backup.unity
+  artifactKey: Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene Backup.unity using Guid(1666b87b062054687bcc1d6ad55a8b44) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'adba2d80754b8c802deb2eb7a1e593ff') in 0.028325541 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 51.126807 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '17a3856e718e4976d5cbf0d78ad4841b') in 0.067468208 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 177.045714 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'd02049707d08b36eb5bdc73ad61c433a') in 0.061109959 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 104.754486 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '35e4223782c092f00c82d128148a68b7') in 0.033100791 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 43.213920 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(815301076,1909f56bfc062723c751e8b465ee728b) (PreviewImporter) -> (artifact id: 'ce8a0d1fff959d6cdbdaa67a66db0f22') in 0.009248166 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 0
+
+========================================================================
+Received Import Request.
+  Time since last request: 18.678752 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: 'ffed640b541a001c00631ec6bf811294') in 0.03560925 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.545543 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '8e6f21b4f2146e8a25a2a979aeac9535') in 0.044523167 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 16.256033 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '66d5ad101588aa5e9294850df7b2850a') in 0.035668042 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 169.750346 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '0f620654a72bff84c59d6076aae545ab') in 0.067305583 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
+========================================================================
+Received Import Request.
+  Time since last request: 12.123260 seconds.
+  path: Assets/Scenes/House1_Scene.unity
+  artifactKey: Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702)
+Start importing Assets/Scenes/House1_Scene.unity using Guid(71cea3ffcceaa474a8a7d17de2cd1354) Importer(2089858483,192608db42251d675da83286b1cce702) (ScriptedImporter) -> (artifact id: '00f35eb019b9c709dfd2dc3f918313bc') in 0.0359655 seconds
+Number of updated asset objects reloaded before import = 0Number of asset objects unloaded after import = 1
+
