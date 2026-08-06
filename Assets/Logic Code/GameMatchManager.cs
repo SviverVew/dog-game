@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -27,6 +28,20 @@ public class GameMatchManager : NetworkBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        // House1_Scene is now gameplay-only. Once its in-scene NetworkObject is
+        // spawned, the server assigns roles automatically instead of relying on
+        // the removed lobby UI/Enter key flow.
+        if (IsServer) StartCoroutine(StartMatchAfterSceneSpawn());
+    }
+
+    private IEnumerator StartMatchAfterSceneSpawn()
+    {
+        yield return null;
+        StartMatchAndAssignRoles();
     }
 
     // Hàm này CHỈ ĐƯỢC GỌI BỞI HOST/SERVER

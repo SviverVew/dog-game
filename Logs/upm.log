@@ -1,0 +1,15 @@
+[2026-08-06T01:51:23.068Z][INFO] Command-line: /Applications/Unity/Hub/Editor/6000.5.2f1/Unity.app/Contents/Helpers/PackageManager/Server/UnityPackageManager server -s 76175 --ipc-path /tmp/Unity-Upm-76175.sock -l 2 --log-file /Users/cuong/Downloads/vscode/dog-game/Logs/upm.log
+[2026-08-06T01:51:23.118Z][ERROR] Failed to start server: listen EPERM: operation not permitted /tmp/Unity-Upm-76175.sock
+{
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '/tmp/Unity-Upm-76175.sock',
+  port: -1,
+  stack: 'Error: listen EPERM: operation not permitted /tmp/Unity-Upm-76175.sock\n' +
+    '    at Server.setupListenHandle [as _listen2] (node:net:1986:21)\n' +
+    '    at listenInCluster (node:net:2065:12)\n' +
+    '    at Server.listen (node:net:2187:5)\n' +
+    '    at Server.startServer3 (/home/bokken/build/output/unity/upm/dist/temp/bundle/app.js:213:6198)\n' +
+    '    at FSReqCallback.oncomplete (node:fs:185:23)'
+}

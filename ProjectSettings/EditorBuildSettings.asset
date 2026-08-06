@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/House1_Scene.unity
     guid: 71cea3ffcceaa474a8a7d17de2cd1354
+  - enabled: 1
+    path: Assets/Scenes/WaitingRoom.unity
+    guid: 3d3277dfd67f643a688967ffe8d04469
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
