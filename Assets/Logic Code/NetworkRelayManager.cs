@@ -91,7 +91,7 @@ public class NetworkRelayManager : MonoBehaviour
         });
     }
 
-    public async Task<Lobby> CreateRoomAsync(string roomName, bool isPublic, int maxPlayers = 4)
+    public async Task<Lobby> CreateRoomAsync(string roomName, bool isPublic, int maxPlayers = 6)
     {
         await EnsureReadyAsync();
         string relayCode = await CreateRelayHost(maxPlayers - 1);

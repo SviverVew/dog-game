@@ -11,6 +11,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CapsuleCollider))]
 public class PersonPlayer : NetworkBehaviour
 {
+    [Header("Legacy gameplay")]
+    [SerializeField] private bool enableLegacySlipperGameplay = false;
     [Header("References")]
     private Rigidbody rb;
     [SerializeField] private Animator animator;
@@ -195,6 +197,9 @@ public class PersonPlayer : NetworkBehaviour
     // --- XỬ LÝ HÀNH ĐỘNG (ĐÁNH, NHẶT, NÉM DÉP) ---
     private void HandleActions()
     {
+        // Movement/camera are reused by the new Hunt game. Slipper combat stays
+        // available only for old test scenes and is disabled by default.
+        if (!enableLegacySlipperGameplay) return;
         // 1. Chuột trái / Phím F: Đánh cận chiến (Punch / Strike)
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.F))
         {

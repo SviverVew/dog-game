@@ -1,28 +1,42 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public enum PlayerRole
+/// <summary>Creates 1 Hunter (+ optional player Guard Dog) versus up to 4 animals.</summary>
+public class HuntMatchManager : NetworkBehaviour
 {
-    Dog,
-    Person
-}
+    public static HuntMatchManager Instance { get; private set; }
 
-public class GameMatchManager : NetworkBehaviour
-{
-    public static GameMatchManager Instance;
+    [Header("Legacy fallback prefabs")]
+    [SerializeField] private GameObject dogPrefab;
+    [SerializeField] private GameObject personPrefab;
 
-    [Header("Prefabs")]
-    public GameObject dogPrefab;    // Prefab Chó (Có NetworkObject)
-    public GameObject personPrefab; // Prefab Người (Có NetworkObject)
+    [Header("Role prefabs (null uses legacy fallback)")]
+    [SerializeField] private GameObject hunterPrefab;
+    [SerializeField] private GameObject guardDogPrefab;
+    [SerializeField] private GameObject wolfPrefab;
+    [SerializeField] private GameObject foxPrefab;
+    [SerializeField] private GameObject monkeyPrefab;
+    [SerializeField] private GameObject boarPrefab;
 
-    [Header("Spawn Points")]
-    public Transform[] dogSpawnPoints;
-    public Transform[] personSpawnPoints;
+    [Header("Spawn points")]
+    [SerializeField] private Transform[] hunterSpawnPoints;
+    [SerializeField] private Transform[] animalSpawnPoints;
+    // Kept so current House1_Scene Inspector data is not lost.
+    [SerializeField] private Transform[] dogSpawnPoints;
+    [SerializeField] private Transform[] personSpawnPoints;
 
-    // Lưu danh sách Role đã phân cho từng ClientId
-    private Dictionary<ulong, PlayerRole> playerRoles = new Dictionary<ulong, PlayerRole>();
+    [Header("Match")]
+    [SerializeField] private float matchDurationSeconds = 600f;
+    [SerializeField] private bool useGuardDogWhenAtLeastThreePlayers = true;
+
+    public NetworkVariable<float> TimeRemaining { get; } = new(600f);
+    public NetworkVariable<bool> MatchRunning { get; } = new(false);
+    public NetworkVariable<HuntTeam> WinningTeam { get; } = new();
+    public NetworkVariable<HuntWinReason> WinReason { get; } = new();
+
+    private readonly Dictionary<ulong, HuntRole> roles = new();
 
     private void Awake()
     {
@@ -32,116 +46,120 @@ public class GameMatchManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // House1_Scene is now gameplay-only. Once its in-scene NetworkObject is
-        // spawned, the server assigns roles automatically instead of relying on
-        // the removed lobby UI/Enter key flow.
-        if (IsServer) StartCoroutine(StartMatchAfterSceneSpawn());
+        if (IsServer) StartCoroutine(StartAfterSceneSpawn());
     }
 
-    private IEnumerator StartMatchAfterSceneSpawn()
+    private IEnumerator StartAfterSceneSpawn()
     {
         yield return null;
         StartMatchAndAssignRoles();
     }
 
-    // Hàm này CHỈ ĐƯỢC GỌI BỞI HOST/SERVER
-    // Hàm này CHỈ ĐƯỢC GỌI BỞI HOST/SERVER
+    private void Update()
+    {
+        if (!IsServer || !MatchRunning.Value) return;
+        TimeRemaining.Value = Mathf.Max(0f, TimeRemaining.Value - Time.deltaTime);
+        if (TimeRemaining.Value <= 0f)
+            EndMatchServer(HuntTeam.WildAnimalTeam, HuntWinReason.TimeExpired);
+    }
+
     public void StartMatchAndAssignRoles()
     {
-        if (!IsServer) return;
+        if (!IsServer || MatchRunning.Value) return;
+        IReadOnlyList<ulong> clients = NetworkManager.Singleton.ConnectedClientsIds;
+        if (clients.Count < 2) return;
 
-        IReadOnlyList<ulong> connectedClients = NetworkManager.Singleton.ConnectedClientsIds;
-
-        if (connectedClients.Count == 0) return;
-
-        // 1. Tạo danh sách ngẫu nhiên các Role (ví dụ 4 người -> 2 Dog, 2 Person)
-        List<PlayerRole> rolesToAssign = new List<PlayerRole>();
-        
-        int dogCount = connectedClients.Count / 2;
-        int personCount = connectedClients.Count - dogCount;
-
-        for (int i = 0; i < dogCount; i++) rolesToAssign.Add(PlayerRole.Dog);
-        for (int i = 0; i < personCount; i++) rolesToAssign.Add(PlayerRole.Person);
-
-        // Tráo đổi ngẫu nhiên danh sách Role (Fisher-Yates Shuffle)
-        for (int i = 0; i < rolesToAssign.Count; i++)
+        roles.Clear();
+        for (int i = 0; i < clients.Count; i++)
         {
-            PlayerRole temp = rolesToAssign[i];
-            int randomIndex = Random.Range(i, rolesToAssign.Count);
-            rolesToAssign[i] = rolesToAssign[randomIndex];
-            rolesToAssign[randomIndex] = temp;
+            HuntRole role;
+            if (i == 0) role = HuntRole.Trapper;
+            else if (i == 1 && clients.Count >= 3 && useGuardDogWhenAtLeastThreePlayers) role = HuntRole.GuardDog;
+            else role = WildRoleForIndex(i - (clients.Count >= 3 && useGuardDogWhenAtLeastThreePlayers ? 2 : 1));
+            roles[clients[i]] = role;
+            ReplacePlayerObject(clients[i], role, i);
         }
 
-        // 2. Phân Role cho từng Client và Spawn nhân vật tương ứng
-        int dogSpawnIdx = 0;
-        int personSpawnIdx = 0;
+        TimeRemaining.Value = matchDurationSeconds;
+        MatchRunning.Value = true;
+        WinReason.Value = HuntWinReason.None;
+    }
 
-        for (int i = 0; i < connectedClients.Count; i++)
+    private static HuntRole WildRoleForIndex(int index)
+    {
+        HuntRole[] wildRoles = { HuntRole.Wolf, HuntRole.Fox, HuntRole.Monkey, HuntRole.Boar };
+        return wildRoles[Mathf.Abs(index) % wildRoles.Length];
+    }
+
+    private void ReplacePlayerObject(ulong clientId, HuntRole role, int spawnIndex)
+    {
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out NetworkClient client) && client.PlayerObject != null)
+            client.PlayerObject.Despawn(true);
+
+        GameObject prefab = GetPrefab(role);
+        if (prefab == null)
         {
-            ulong clientId = connectedClients[i];
-            PlayerRole assignedRole = rolesToAssign[i];
-
-            playerRoles[clientId] = assignedRole;
-
-            // 🚨 BƯỚC 1: Xóa con cũ ĐÚNG CHUẨN NETCODE (Despawn trước khi Destroy)
-            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
-            {
-                if (client.PlayerObject != null)
-                {
-                    var oldNetObj = client.PlayerObject;
-                    oldNetObj.Despawn(true); // Despawn và Destroy luôn object cũ
-                    Debug.Log($"[Match] Đã Despawn PlayerObject cũ cho client {clientId}");
-                }
-            }
-
-            // 🚨 BƯỚC 2: Tính toán vị trí & Góc xoay Spawn chuẩn
-            GameObject prefabToSpawn = (assignedRole == PlayerRole.Dog) ? dogPrefab : personPrefab;
-            Vector3 spawnPos = Vector3.zero;
-            Quaternion spawnRot = Quaternion.identity;
-
-            if (assignedRole == PlayerRole.Dog && dogSpawnPoints != null && dogSpawnPoints.Length > 0)
-            {
-                Transform sp = dogSpawnPoints[dogSpawnIdx % dogSpawnPoints.Length];
-                if (sp != null)
-                {
-                    spawnPos = sp.position;
-                    spawnRot = sp.rotation;
-                }
-                dogSpawnIdx++;
-            }
-            else if (assignedRole == PlayerRole.Person && personSpawnPoints != null && personSpawnPoints.Length > 0)
-            {
-                Transform sp = personSpawnPoints[personSpawnIdx % personSpawnPoints.Length];
-                if (sp != null)
-                {
-                    spawnPos = sp.position;
-                    spawnRot = sp.rotation;
-                }
-                personSpawnIdx++;
-            }
-
-            // 🚨 BƯỚC 3: Instantiate tại đúng Position và Rotation
-            if (prefabToSpawn == null)
-            {
-                Debug.LogError($"[Match] Prefab to spawn is null for role {assignedRole} (client {clientId}). Skipping.");
-                continue;
-            }
-
-            GameObject playerInstance = Instantiate(prefabToSpawn, spawnPos, spawnRot);
-
-            // Spawn qua mạng cho Client
-            NetworkObject netObj = playerInstance.GetComponent<NetworkObject>();
-            if (netObj != null)
-            {
-                netObj.SpawnAsPlayerObject(clientId, true);
-                Debug.Log($"[Match] Spawned NetworkObject (id={netObj.NetworkObjectId}) for client {clientId}");
-            }
-            else
-            {
-                Debug.LogError($"[Match] Prefab {prefabToSpawn.name} does not contain a NetworkObject component!");
-            }
-
-            Debug.Log($"<color=green>[Match] Client [{clientId}] Spawn tại: {spawnPos} với Role: {assignedRole}</color>");
+            Debug.LogError($"Missing prefab for {role}");
+            return;
         }
+
+        Transform spawn = GetSpawn(role, spawnIndex);
+        GameObject instance = Instantiate(prefab,
+            spawn == null ? Vector3.zero : spawn.position,
+            spawn == null ? Quaternion.identity : spawn.rotation);
+        NetworkObject networkObject = instance.GetComponent<NetworkObject>();
+        if (networkObject == null)
+        {
+            Debug.LogError($"{prefab.name} needs NetworkObject");
+            Destroy(instance);
+            return;
+        }
+        networkObject.SpawnAsPlayerObject(clientId, true);
+    }
+
+    private GameObject GetPrefab(HuntRole role)
+    {
+        return role switch
+        {
+            HuntRole.GuardDog => guardDogPrefab != null ? guardDogPrefab : dogPrefab,
+            HuntRole.Wolf => wolfPrefab != null ? wolfPrefab : dogPrefab,
+            HuntRole.Fox => foxPrefab != null ? foxPrefab : dogPrefab,
+            HuntRole.Monkey => monkeyPrefab != null ? monkeyPrefab : dogPrefab,
+            HuntRole.Boar => boarPrefab != null ? boarPrefab : dogPrefab,
+            _ => hunterPrefab != null ? hunterPrefab : personPrefab
+        };
+    }
+
+    private Transform GetSpawn(HuntRole role, int index)
+    {
+        bool hunterSide = role is HuntRole.Trapper or HuntRole.Ranger or HuntRole.Veterinarian or HuntRole.Photographer or HuntRole.GuardDog;
+        Transform[] points = hunterSide
+            ? (hunterSpawnPoints != null && hunterSpawnPoints.Length > 0 ? hunterSpawnPoints : personSpawnPoints)
+            : (animalSpawnPoints != null && animalSpawnPoints.Length > 0 ? animalSpawnPoints : dogSpawnPoints);
+        return points != null && points.Length > 0 ? points[index % points.Length] : null;
+    }
+
+    public void NotifyCharacterDownServer(NetworkCharacterBase character, ulong attackerClientId)
+    {
+        if (!IsServer || !MatchRunning.Value) return;
+        bool hunterAlive = false;
+        foreach (NetworkCharacterBase candidate in FindObjectsByType<NetworkCharacterBase>(FindObjectsSortMode.None))
+        {
+            if (candidate.Team.Value == HuntTeam.HunterTeam && candidate.Role.Value != HuntRole.GuardDog && candidate.IsAlive)
+                hunterAlive = true;
+        }
+        if (!hunterAlive) EndMatchServer(HuntTeam.WildAnimalTeam, HuntWinReason.HunterDown);
+    }
+
+    public void EndMatchServer(HuntTeam winner, HuntWinReason reason)
+    {
+        if (!IsServer || !MatchRunning.Value) return;
+        MatchRunning.Value = false;
+        WinningTeam.Value = winner;
+        WinReason.Value = reason;
+        Debug.Log($"Match ended. Winner={winner}, reason={reason}");
     }
 }
+
+// Compatibility for the component already serialized in House1_Scene.
+public class GameMatchManager : HuntMatchManager { }

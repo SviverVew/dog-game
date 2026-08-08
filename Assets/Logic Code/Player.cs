@@ -17,6 +17,8 @@ namespace StarterAssets
 #endif
     public class Player : NetworkBehaviour
     {
+        [Header("Legacy gameplay")]
+        [SerializeField] private bool enableLegacyDogActions = false;
         [Header("References")]
         private Rigidbody rb;
         
@@ -388,6 +390,8 @@ namespace StarterAssets
 
         private void UpdateActions()
         {
+            // Role components (WolfAnimal, FoxAnimal, ...) own Q in the new game.
+            if (!enableLegacyDogActions) return;
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 Bite();

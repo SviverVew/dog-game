@@ -14,6 +14,7 @@ public class WaitingRoomController : NetworkBehaviour
     [SerializeField] private string gameSceneName = "House1_Scene";
     [SerializeField] private string menuSceneName = "Menu_Game";
     [SerializeField] private int minimumPlayers = 2;
+    [SerializeField] private int maximumPlayers = 6;
     [SerializeField] private float countdownSeconds = 30f;
 
     private readonly NetworkVariable<float> timeLeft = new(-1f);
@@ -79,7 +80,7 @@ public class WaitingRoomController : NetworkBehaviour
     private void RefreshUI()
     {
         int count = NetworkManager == null ? 0 : NetworkManager.ConnectedClientsIds.Count;
-        playerListText.text = $"Người chơi: {count}/4";
+        playerListText.text = $"Người chơi: {count}/{maximumPlayers}";
         string code = NetworkRelayManager.Instance?.CurrentLobby?.LobbyCode ?? "------";
         roomCodeText.text = "Mã phòng: " + code;
         countdownText.text = timeLeft.Value < 0f
